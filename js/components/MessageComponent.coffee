@@ -1,8 +1,14 @@
 util = require '../util.coffee'
 clas = require 'classnames'
 
+imgurUtil = require '../imgurUtil.coffee'
+
+imgurUtil.saveClientId('3bca362ef26392d')
+
+imgurUtil.getData('http://imgur.com/gallery/ibIWC', (j) -> console.log(j))
+
 recl = React.createClass
-{div,pre,a,label,h2,h3} = React.DOM
+{img,div,pre,a,label,h2,h3} = React.DOM
 
 Member          = require './MemberComponent.coffee'
 
@@ -30,12 +36,25 @@ module.exports = recl
     return if user.toLowerCase() is 'system'
     @props._handlePm user
 
+  testUrlForImg: (url) ->
+    r = /(jpg|jpeg|png|gif|tiff|JPG)/
+    if r.exec(url.txt) then true else false
+
+  renderImage: (url) ->
+    style = 
+      height: @props.height * 3.5
+    (div {className: "imgCont", style}, 
+      (a {href: url.txt}, 
+        (img {src:url.txt, style: {height: '100%'}})
+      )
+    )
+
   renderSpeech: ({lin,app,exp,tax,url,mor,fat,com}) ->  # one of
     switch
       when (lin or app or exp or tax)
         (lin or app or exp or tax).txt
       when url
-        (a {href:url.txt,target:"_blank",key:"speech"}, url.txt)
+        if @testUrlForImg(url) then @renderImage(url) else (a {href:url.txt,target:"_blank",key:"speech"}, url.txt)
       when com
         (div {},
           com.txt
@@ -58,7 +77,8 @@ module.exports = recl
 
   classesInSpeech: ({url,exp,app,lin,mor,fat}) -> # at most one of
     switch
-      when url then "url"
+      when url 
+        if @testUrlForImg(url) then "img" else "url"
       when exp then "exp"
       when app then "say"
       when lin then {say: lin.say is false}
@@ -67,6 +87,7 @@ module.exports = recl
 
   render: ->
     {thought} = @props
+    console.log(thought)
     delivery = _.uniq _.pluck thought.audience, "delivery"
     speech = thought.statement.speech
     bouquet = thought.statement.bouquet
@@ -97,8 +118,9 @@ module.exports = recl
       @classesInSpeech speech
 
     style =
-      height: @props.height
+      height: if /img/.exec(className) then @props.height * 4 else @props.height
       marginTop: @props.marginTop
+
     (div {className, 'data-index':@props.index, key:"message", style},
         (div {className:"meta",key:"meta"},
           label {className:"type #{type}","data-glyph":(@props.glyph || "*")}
