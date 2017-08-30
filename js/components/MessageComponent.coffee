@@ -5,12 +5,11 @@ imgurUtil = require '../imgurUtil.coffee'
 
 imgurUtil.saveClientId('3bca362ef26392d')
 
-imgurUtil.getData('http://imgur.com/gallery/ibIWC', (j) -> console.log(j))
-
 recl = React.createClass
 {img,div,pre,a,label,h2,h3} = React.DOM
 
 Member          = require './MemberComponent.coffee'
+Expanded        = require './ExpandedComponent.coffee'
 
 module.exports = recl
   displayName: "Message"
@@ -36,25 +35,27 @@ module.exports = recl
     return if user.toLowerCase() is 'system'
     @props._handlePm user
 
-  testUrlForImg: (url) ->
+  _testUrlForImg: (url) ->
     r = /(jpg|jpeg|png|gif|tiff|JPG)/
     if r.exec(url.txt) then true else false
 
-  renderImage: (url) ->
-    style = 
-      height: @props.height * 3.5
-    (div {className: "imgCont", style}, 
-      (a {href: url.txt}, 
-        (img {src:url.txt, style: {height: '100%'}})
-      )
-    )
+  _testUrlForImgur: (url) ->
+    if url.txt.indexOf('imgur') < 0 then false else true
+
 
   renderSpeech: ({lin,app,exp,tax,url,mor,fat,com}) ->  # one of
     switch
       when (lin or app or exp or tax)
         (lin or app or exp or tax).txt
       when url
-        if @testUrlForImg(url) then @renderImage(url) else (a {href:url.txt,target:"_blank",key:"speech"}, url.txt)
+        if @_testUrlForImg(url) 
+          (React.createElement Expanded, {type: 'img', height: @props.height * 3.5, url: url.txt})
+        else if @_testUrlForImgur(url)
+          console.log('imgur!')
+        #  #imgurUtil.getData(url.txt, @_handleImgurJson)
+          (React.createElement Expanded, {type: 'imgur', height: @props.height * 3.5, url: url.txt})
+        else
+          (a {href:url.txt,target:"_blank",key:"speech"}, url.txt)
       when com
         (div {},
           com.txt
@@ -78,7 +79,7 @@ module.exports = recl
   classesInSpeech: ({url,exp,app,lin,mor,fat}) -> # at most one of
     switch
       when url 
-        if @testUrlForImg(url) then "img" else "url"
+        if @_testUrlForImg(url) then "img" else "url"
       when exp then "exp"
       when app then "say"
       when lin then {say: lin.say is false}
