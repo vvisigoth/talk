@@ -1,5 +1,7 @@
 imgur = require 'imgur'
 
+{img,div,pre,a,label,h2,h3} = React.DOM
+
 module.exports = imgurUtil =
   saveClientId: (id) ->
     imgur.saveClientId(id)
@@ -8,17 +10,19 @@ module.exports = imgurUtil =
     imgur.getInfo(id)
     .then (json) ->
       cb(json)
-    .then null, (err) -> 
+    .catch (err) -> 
       # Handle error
-      console.log(err)
+      console.log('error')
+      cb(err)
 
   getAlbumInfo: (id, cb) ->
     imgur.getAlbumInfo(id)
     .then (json) ->
       cb(json)
-    .then null, (err) -> 
+    .catch (err) -> 
       # Handle error
-      console.log(err)
+      console.log('error')
+      cb(err)
 
   getData: (url, cb) ->
     r = /imgur\.com\/(gallery|image)\/([a-zA-Z0-9]+)/    
@@ -29,5 +33,6 @@ module.exports = imgurUtil =
       else
         @getAlbumInfo(test[2], cb)
     else
-      return
+      return url
+      
 

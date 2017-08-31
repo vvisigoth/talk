@@ -6,10 +6,13 @@
   "dependencies": {
     "classnames": "^2.2.0",
     "coffeeify": "2.0.1",
-    "husl": "^6.0.1",
     "envify": "^3.4.0",
-    "watchify": "^3.7.0",
-    "node-sass": "^3.4.2"
+    "fs": "0.0.1-security",
+    "husl": "^6.0.1",
+    "imgur": "^0.2.1",
+    "imgur-node-api": "^0.1.0",
+    "node-sass": "^3.4.2",
+    "watchify": "^3.7.0"
   },
   "browserify": {
     "transform": [

@@ -11,10 +11,25 @@ recl = React.createClass
 Member          = require './MemberComponent.coffee'
 Expanded        = require './ExpandedComponent.coffee'
 
-module.exports = recl
-  displayName: "Message"
+class Message extends React.Component
+  constructor: (props) ->
+    super props
+    @state =
+      expanded: false
+    console.log(props.thought.statement.speech)
+    @_toggleExpand = @_toggleExpand.bind(@)
 
   lz: (n) -> if n<10 then "0#{n}" else "#{n}"
+
+  componentDidMount: ->
+    if @props.thought.statement.speech.url
+      switch @_testUrl(@props.thought.statement.speech.url)
+        when 'imgur'
+          @setState({expanded: true})
+        when 'image'
+          @setState({expanded: true})
+        else
+          @setState({expanded: false})
 
   convTime: (time) ->
     d = new Date time
@@ -35,27 +50,33 @@ module.exports = recl
     return if user.toLowerCase() is 'system'
     @props._handlePm user
 
-  _testUrlForImg: (url) ->
+  _testUrl: (url) ->
+    console.log(url)
     r = /(jpg|jpeg|png|gif|tiff|JPG)/
-    if r.exec(url.txt) then true else false
+    if r.exec(url.txt) 
+      return 'image'
+    else
+      if url.txt.indexOf('imgur') > -1
+        return 'imgur'
+      else
+        return 'url'
 
-  _testUrlForImgur: (url) ->
-    if url.txt.indexOf('imgur') < 0 then false else true
-
+  _toggleExpand: ->
+    console.log('called')
+    if @state.expanded then @setState({expanded: false}) else @setState({expanded: true})
 
   renderSpeech: ({lin,app,exp,tax,url,mor,fat,com}) ->  # one of
     switch
       when (lin or app or exp or tax)
         (lin or app or exp or tax).txt
       when url
-        if @_testUrlForImg(url) 
-          (React.createElement Expanded, {type: 'img', height: @props.height * 3.5, url: url.txt})
-        else if @_testUrlForImgur(url)
-          console.log('imgur!')
-        #  #imgurUtil.getData(url.txt, @_handleImgurJson)
-          (React.createElement Expanded, {type: 'imgur', height: @props.height * 3.5, url: url.txt})
-        else
-          (a {href:url.txt,target:"_blank",key:"speech"}, url.txt)
+        switch @_testUrl(url) 
+          when 'image'
+            (React.createElement Expanded, {type: 'image', height: @props.height * 4.5, url: url.txt, toggleExpand: @_toggleExpand})
+          when 'imgur'
+            (React.createElement Expanded, {type: 'imgur', height: @props.height * 4.5, url: url.txt, toggleExpand: @_toggleExpand})
+          else
+            (a {href:url.txt,target:"_blank",key:"speech"}, url.txt)
       when com
         (div {},
           com.txt
@@ -79,7 +100,13 @@ module.exports = recl
   classesInSpeech: ({url,exp,app,lin,mor,fat}) -> # at most one of
     switch
       when url 
-        if @_testUrlForImg(url) then "img" else "url"
+        switch @_testUrl(url) 
+          when 'image'
+            "img"
+          when 'imgur'
+            "img"
+          else
+            "url"
       when exp then "exp"
       when app then "say"
       when lin then {say: lin.say is false}
@@ -88,7 +115,6 @@ module.exports = recl
 
   render: ->
     {thought} = @props
-    console.log(thought)
     delivery = _.uniq _.pluck thought.audience, "delivery"
     speech = thought.statement.speech
     bouquet = thought.statement.bouquet
@@ -119,7 +145,7 @@ module.exports = recl
       @classesInSpeech speech
 
     style =
-      height: if /img/.exec(className) then @props.height * 4 else @props.height
+      height: if @state.expanded then @props.height * 5 else @props.height
       marginTop: @props.marginTop
 
     (div {className, 'data-index':@props.index, key:"message", style},
@@ -134,3 +160,4 @@ module.exports = recl
         (div {className:"speech",key:"speech"},
           @renderSpeech speech,bouquet
     ))
+module.exports = Message
