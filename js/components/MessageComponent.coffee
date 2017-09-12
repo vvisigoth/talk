@@ -49,9 +49,8 @@ module.exports = recl
     if @state?
       if not @state.totalWidth?
         b = @refs.unfurl.getBoundingClientRect()
-        console.log('@refs.unfurl.getBoundingClientRect()')
-        console.log(@refs.unfurl.getBoundingClientRect())
         @setState {totalWidth: b.width}
+        @setState {totalHeight: b.height}
 
   renderSpeech: ({lin,app,exp,tax,url,mor,fat,com}) ->  # one of
     switch
@@ -65,12 +64,14 @@ module.exports = recl
           console.log('redner state')
           console.log(@state)
           style =
-            #width: if @state? then 'calc(99% -' + @state.imgWidth + 'px)' else '100%'
             width: if @state? and @state.totalWidth? then (@state.totalWidth - @state.imgWidth - 20) else '100%'
-          console.log(style)
+            height: @props.height * 2.5
+
+          dstyle =
+            width: if @state? and @state.totalWidth? then @state.totalWidth else '100%'
           if j.image?
             (div {className: "unfurled", ref: "unfurl"},
-              (div {className: "title"}, j.title)
+              (div {className: "title", style: dstyle}, j.title)
               (div {className: "imageCont", style: {height: @props.height * 2.5}},
                 (img {src: j.image, onLoad: @_measureSelf})
               )
@@ -79,7 +80,7 @@ module.exports = recl
             )
           else
             (div {className: "unfurled"},
-              (div {className: "title"}, j.title)
+              (div {className: "title", style: dstyle}, j.title)
               (div {className: "onlyDescription", style}, j.description)
             )
         else
