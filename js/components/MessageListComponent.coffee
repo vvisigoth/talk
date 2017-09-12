@@ -166,14 +166,22 @@ module.exports = recl
       lineNums = 1
       speechArr = []
       context.font = FONT_SIZE + 'px bau'
-      if message.thought.statement.speech.lin?
-        speechArr = message.thought.statement.speech.lin.txt.split(/(\s|-)/)
-      else if message.thought.statement.speech.url?
-        speechArr = message.thought.statement.speech.url.txt.split(/(\s|-)/)
-      else if message.thought.statement.speech.fat?
+      speec = message.thought.statement.speech
+      if speec.lin?
+        speechArr = speec.lin.txt.split(/(\s|-)/)
+      else if speec.url?
+        speechArr = speec.url.txt.split(/(\s|-)/)
+      #This corresponds to the fix put into compiled code by ~palfun
+      else if speec.fat?
         context.font = (FONT_SIZE * 0.9) + 'px scp'
-        speechArr = message.thought.statement.speech.fat.taf.exp.txt.split(/(\s|-)/)
-
+        if typeof speec.fat.taf.exp isnt 'undefined'
+          speechArr = speec.fat.taf.exp.txt.split(/(\s|-)/)  
+        else if typeof speec.fat.taf.app isnt 'undefined'
+          speechArr = speec.fat.taf.app.txt
+        else if typeof speec.fat.taf.lin isnt 'undefined'
+          speechArr = speec.fat.taf.lin.txt
+        else
+          speechArr = "unsupported fat speech"
       _.reduce(_.tail(speechArr), (base, word) ->
         if context.measureText(base + word).width > speechLength
           lineNums += 1
