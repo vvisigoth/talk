@@ -5,6 +5,7 @@ recl = React.createClass
 {img, div,pre,a,label,h2,h3} = React.DOM
 
 Member          = require './MemberComponent.coffee'
+Unfurled          = require './UnfurledComponent.coffee'
 
 module.exports = recl
   displayName: "Message"
@@ -33,16 +34,13 @@ module.exports = recl
     @props._handlePm user
 
   _isUnfurl: (speech)->
-    console.log(speech)
     if speech.app? and speech.app.src == 'unfurl'
         return true
     else
       return false
 
   _measureSelf: ({target:img}) ->
-    console.log(img.offsetHeight)
     @setState {imgHeight: img.offsetHeight}
-    console.log(img.offsetWidth)
     @setState {imgWidth: img.offsetWidth}
 
   componentDidUpdate: ->
@@ -55,34 +53,9 @@ module.exports = recl
   renderSpeech: ({lin,app,exp,tax,url,mor,fat,com}) ->  # one of
     switch
       when (lin or app or exp or tax)
-        # logic here for expanded
         if app? and app.src == 'unfurl'
-          console.log(app)
           j = JSON.parse(app.txt)
-          console.log('json')
-          console.log(j)
-          console.log('redner state')
-          console.log(@state)
-          style =
-            width: if @state? and @state.totalWidth? then (@state.totalWidth - @state.imgWidth - 20) else '100%'
-            height: @props.height * 2.5
-
-          dstyle =
-            width: if @state? and @state.totalWidth? then @state.totalWidth else '100%'
-          if j.image?
-            (div {className: "unfurled", ref: "unfurl"},
-              (div {className: "title", style: dstyle}, j.title)
-              (div {className: "imageCont", style: {height: @props.height * 2.5}},
-                (img {src: j.image, onLoad: @_measureSelf})
-              )
-              # make this width dependent on image state
-              (div {className: "description", style}, j.description)
-            )
-          else
-            (div {className: "unfurled"},
-              (div {className: "title", style: dstyle}, j.title)
-              (div {className: "onlyDescription", style}, j.description)
-            )
+          (React.createElement Unfurled, {title: j.title, description: j.description, image: j.image, height: @props.height})
         else
           (lin or app or exp or tax).txt
       when url
