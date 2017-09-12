@@ -2,7 +2,7 @@ util = require '../util.coffee'
 clas = require 'classnames'
 
 recl = React.createClass
-{div,pre,a,label,h2,h3} = React.DOM
+{img, div,pre,a,label,h2,h3} = React.DOM
 
 Member          = require './MemberComponent.coffee'
 
@@ -10,6 +10,8 @@ module.exports = recl
   displayName: "Message"
 
   lz: (n) -> if n<10 then "0#{n}" else "#{n}"
+
+  setInitialStore: -> {}
 
   convTime: (time) ->
     d = new Date time
@@ -30,10 +32,58 @@ module.exports = recl
     return if user.toLowerCase() is 'system'
     @props._handlePm user
 
+  _isUnfurl: (speech)->
+    console.log(speech)
+    if speech.app? and speech.app.src == 'unfurl'
+        return true
+    else
+      return false
+
+  _measureSelf: ({target:img}) ->
+    console.log(img.offsetHeight)
+    @setState {imgHeight: img.offsetHeight}
+    console.log(img.offsetWidth)
+    @setState {imgWidth: img.offsetWidth}
+
+  componentDidUpdate: ->
+    if @state?
+      if not @state.totalWidth?
+        b = @refs.unfurl.getBoundingClientRect()
+        console.log('@refs.unfurl.getBoundingClientRect()')
+        console.log(@refs.unfurl.getBoundingClientRect())
+        @setState {totalWidth: b.width}
+
   renderSpeech: ({lin,app,exp,tax,url,mor,fat,com}) ->  # one of
     switch
       when (lin or app or exp or tax)
-        (lin or app or exp or tax).txt
+        # logic here for expanded
+        if app? and app.src == 'unfurl'
+          console.log(app)
+          j = JSON.parse(app.txt)
+          console.log('json')
+          console.log(j)
+          console.log('redner state')
+          console.log(@state)
+          style =
+            #width: if @state? then 'calc(99% -' + @state.imgWidth + 'px)' else '100%'
+            width: if @state? and @state.totalWidth? then (@state.totalWidth - @state.imgWidth - 20) else '100%'
+          console.log(style)
+          if j.image?
+            (div {className: "unfurled", ref: "unfurl"},
+              (div {className: "title"}, j.title)
+              (div {className: "imageCont", style: {height: @props.height * 2.5}},
+                (img {src: j.image, onLoad: @_measureSelf})
+              )
+              # make this width dependent on image state
+              (div {className: "description", style}, j.description)
+            )
+          else
+            (div {className: "unfurled"},
+              (div {className: "title"}, j.title)
+              (div {className: "onlyDescription", style}, j.description)
+            )
+        else
+          (lin or app or exp or tax).txt
       when url
         (a {href:url.txt,target:"_blank",key:"speech"}, url.txt)
       when com
@@ -97,7 +147,7 @@ module.exports = recl
       @classesInSpeech speech
 
     style =
-      height: @props.height
+      height: if @_isUnfurl(@props.thought.statement.speech) then @props.height * 3.5 else @props.height
       marginTop: @props.marginTop
     (div {className, 'data-index':@props.index, key:"message", style},
         (div {className:"meta",key:"meta"},
