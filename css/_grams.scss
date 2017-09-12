@@ -145,6 +145,10 @@ div.gram.same:hover div.meta {
   }
 }
 
+.comment .speech {
+  display: none;
+}
+
 .gram pre { background-color: transparent; }
 
 div.gram label { background-color: #000; }
@@ -170,6 +174,43 @@ div.gram.pending .speech { color: $gray-light; }
 // div.gram label[data-glyph="@"] {
 //   background-color: $blue;
 // }
+
+.unfurled img
+{
+  height: 100%
+}
+
+.unfurled .imageCont
+{
+  float: left;
+}
+.unfurled .description
+{
+  float: left;
+  overflow:hidden;
+}
+
+.unfurled .title
+{
+  font-style: initial;
+  font-size: 1.2em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.unfurled .onlyDescription
+{
+  font-style: italic;
+}
+
+.unfurled .description
+{
+  font-style: italic;
+  width: calc(49% - 10px);
+  margin-left: 10px;
+}
+
 
 .author,
 .path { cursor: pointer; }
