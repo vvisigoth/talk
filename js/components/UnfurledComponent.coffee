@@ -1,7 +1,7 @@
 clas = require 'classnames'
 
 recl = React.createClass
-{img,div,pre,a,label,h2,h3} = React.DOM
+{img,div,pre,a,label,h2,h3,iframe} = React.DOM
 
 module.exports = recl
   displayName: "Unfurled"
@@ -28,11 +28,29 @@ module.exports = recl
       width: if @state? and @state.totalWidth? then @state.totalWidth else '100%'
       #width: '100%'
 
-    if @props.image?
+    vstyle =
+      #width: if @state? and @state.totalWidth? then (@state.totalWidth - ((@props.pw * @props.height * 2.5)/ @props.ph) - 20) else '40%'
+      width: if @state? and @state.totalWidth? then @state.totalWidth else '40%'
+
+    console.log(vstyle)
+    console.log(@props.title)
+    console.log('vstyle')
+
+    if @props.player isnt ""
       (div {className: "unfurled", ref: "unfurl"},
         (div {className: "title", style: dstyle}, @props.title)
         (div {className: "imageCont", style: {height: @props.height * 2.5}},
+          (iframe {src: @props.player, height: @props.height * 2.5, width: ((@props.pw * @props.height * 2.5)/ @props.ph)})
+        )
+        (div {className: "description", style: vstyle}, @props.description)
+      )
+    else if @props.image isnt ""
+      (div {className: "unfurled", ref: "unfurl"},
+        (div {className: "title", style: dstyle}, @props.title)
+        (div {className: "imageCont", style: {height: @props.height * 2.5}},
+          (a {src: if @props.url is "" then @props.image else @props.url},
           (img {src: @props.image, onLoad: @_measureSelf})
+          )
         )
         (div {className: "description", style}, @props.description)
       )
