@@ -55,7 +55,7 @@ module.exports = recl
       when (lin or app or exp or tax)
         if app? and app.src == 'unfurl'
           j = JSON.parse(app.txt)
-          (React.createElement Unfurled, {title: j.title, description: j.description, image: j.image, height: @props.height})
+          (React.createElement Unfurled, {title: j.title, description: j.description, player: j.player, pw: j['player-width'], ph: j['player-height'], url: j.url, image: j.image, height: @props.height})
         else
           (lin or app or exp or tax).txt
       when url
