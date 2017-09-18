@@ -86,9 +86,15 @@ module.exports = recl
 
   componentWillMount: -> Infinite = window.Infinite # require 'react-infinite'
 
+
+
   componentDidMount: ->
     MessageStore.addChangeListener @_onChangeStore
     StationStore.addChangeListener @_onChangeStore
+
+    b = @refs.list.getBoundingClientRect()
+    @setState {width: b.width}
+
     if @state.station and @state.listening.indexOf(@state.station) is -1
       MessageActions.listenStation @state.station
     unless @props.static?
@@ -211,6 +217,7 @@ module.exports = recl
       mez = rele Message, (_.extend {}, message, {
         station, sameAs, @_handlePm, @_handleAudi, height, marginTop,
         index: message.key
+        width: @state.width
         key: "message-#{message.key}"
         ship: if speech?.app then "system" else message.ship
         glyph: @state.glyph[audience] || @props['default-glyph']
@@ -239,4 +246,4 @@ module.exports = recl
       
     fetching = if @state.fetching then (rele Load, {})
 
-    (div {className:"grams", key:"messages"}, body, fetching)
+    (div {className:"grams", ref: "list", key:"messages"}, body, fetching)
