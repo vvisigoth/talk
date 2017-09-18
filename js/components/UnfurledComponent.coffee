@@ -5,7 +5,6 @@ recl = React.createClass
 
 module.exports = recl
   displayName: "Unfurled"
-  #render: ->
 
   setInitialStore: -> {}
 
@@ -13,34 +12,22 @@ module.exports = recl
     @setState {imgHeight: img.offsetHeight}
     @setState {imgWidth: img.offsetWidth}
 
-  componentDidUpdate: ->
-    if @state?
-      if not @state.totalWidth?
-        b = @refs.unfurl.getBoundingClientRect()
-        @setState {totalWidth: b.width}
-
   render: ->
     style =
-      width: if @state? and @state.totalWidth? then (@state.totalWidth - @state.imgWidth - 20) else '100%'
+      width: if @state? and @props.width? then (@props.width - @state.imgWidth - 20) else '100%'
       height: @props.height * 2.5
 
     dstyle =
-      width: if @state? and @state.totalWidth? then @state.totalWidth else '100%'
-      #width: '100%'
+      width: if @state? and @props.width? then @props.width else '100%'
 
     vstyle =
-      #width: if @state? and @state.totalWidth? then (@state.totalWidth - ((@props.pw * @props.height * 2.5)/ @props.ph) - 20) else '40%'
-      width: if @state? and @state.totalWidth? then @state.totalWidth else '40%'
-
-    console.log(vstyle)
-    console.log(@props.title)
-    console.log('vstyle')
+      width: if @state? and @props.width? then @props.width else '40%'
 
     if @props.player isnt ""
       (div {className: "unfurled", ref: "unfurl"},
         (div {className: "title", style: dstyle}, @props.title)
         (div {className: "imageCont", style: {height: @props.height * 2.5}},
-          (iframe {src: @props.player, height: @props.height * 2.5, width: ((@props.pw * @props.height * 2.5)/ @props.ph)})
+          (iframe {src: @props.player, allowfullscreen: true, height: @props.height * 2.5, width: ((@props.pw * @props.height * 2.5)/ @props.ph)})
         )
         (div {className: "description", style: vstyle}, @props.description)
       )
