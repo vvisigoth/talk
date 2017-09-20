@@ -7,8 +7,15 @@ recl = React.createClass
 Member          = require './MemberComponent.coffee'
 Unfurled          = require './UnfurledComponent.coffee'
 
-module.exports = recl
-  displayName: "Message"
+#module.exports = recl
+  #displayName: "Message"
+
+class Message extends React.Component
+  constructor: (props) ->
+    super props
+    @state = 
+      height: props.height
+    @_reHeight = @_reHeight.bind(@)
 
   lz: (n) -> if n<10 then "0#{n}" else "#{n}"
 
@@ -114,7 +121,7 @@ module.exports = recl
       @classesInSpeech speech
 
     style =
-      height: if @_isUnfurl(@props.thought.statement.speech) then @props.height * 3.5 else @props.height
+      height: if @_isUnfurl(@props.thought.statement.speech) then @state.height * 4.5 else @state.height
       marginTop: @props.marginTop
     (div {className, 'data-index':@props.index, key:"message", style},
         (div {className:"meta",key:"meta"},
@@ -128,3 +135,5 @@ module.exports = recl
         (div {className:"speech",key:"speech"},
           @renderSpeech speech,bouquet
     ))
+
+module.exports = Message
