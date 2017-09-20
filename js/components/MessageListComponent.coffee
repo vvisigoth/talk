@@ -86,7 +86,11 @@ module.exports = recl
 
   componentWillMount: -> Infinite = window.Infinite # require 'react-infinite'
 
-
+  _isUnfurl: (speech)->
+    if speech.app? and speech.app.src == 'unfurl'
+        return true
+    else
+      return false
 
   componentDidMount: ->
     MessageStore.addChangeListener @_onChangeStore
@@ -173,6 +177,9 @@ module.exports = recl
       speechArr = []
       context.font = FONT_SIZE + 'px bau'
       speec = message.thought.statement.speech
+      #override sameas logic if unfurl
+      if @_isUnfurl(speec)
+        sameAs = false
       if speec.lin?
         speechArr = speec.lin.txt.split(/(\s|-)/)
       else if speec.url?
@@ -218,6 +225,7 @@ module.exports = recl
         station, sameAs, @_handlePm, @_handleAudi, height, marginTop,
         index: message.key
         width: @state.width
+        unfurl: @_isUnfurl(speec)
         key: "message-#{message.key}"
         ship: if speech?.app then "system" else message.ship
         glyph: @state.glyph[audience] || @props['default-glyph']
