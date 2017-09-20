@@ -50,12 +50,15 @@ class Message extends React.Component
     @setState {imgHeight: img.offsetHeight}
     @setState {imgWidth: img.offsetWidth}
 
+  _reHeight: (neu) ->
+    @setState {height: neu}
+
   renderSpeech: ({lin,app,exp,tax,url,mor,fat,com}) ->  # one of
     switch
       when (lin or app or exp or tax)
         if app? and app.src == 'unfurl'
           j = JSON.parse(app.txt)
-          (React.createElement Unfurled, {title: j.title, description: j.description, player: j.player, pw: j['player-width'], ph: j['player-height'], url: j.url, image: j.image, height: @props.height, width: @props.width})
+          (React.createElement Unfurled, {title: j.title, type: 'tall', description: j.description, player: j.player, pw: j['player-width'], ph: j['player-height'], url: j.url, image: j.image, height: @state.height, reHeight: @_reHeight, width: @props.width, type: if @props.width > 400 then 'wide' else 'tall'})
         else
           (lin or app or exp or tax).txt
       when url
